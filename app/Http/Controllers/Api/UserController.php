@@ -130,6 +130,34 @@ class UserController extends Controller
         ]);
     }
 
+    public function getUserById($id)
+    {
+        $user = User::find($id);
+        $preferences = $user->preferences;
+        $totalPoints = $user->getTotalPointsAttribute();
+        $itemsRecycled = $user->getItemsRecycledAttribute();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'createdAt' => $user->created_at,
+                'lastLogin' => $user->last_login_at,
+                'accountType' => $user->account_type,
+                'subscriptionStatus' => $user->subscription_status,
+                'recyclingStats' => [
+                    'totalItems' => $itemsRecycled,
+                    'totalPoints' => $totalPoints,
+                    'weeklyAverage' => $this->calculateWeeklyAverage($user->id),
+                ],
+                'preferences' => $preferences,
+            ]
+        ]);
+    }
+
     public function updatePreferences(Request $request)
     {
         $validator = Validator::make($request->all(), [

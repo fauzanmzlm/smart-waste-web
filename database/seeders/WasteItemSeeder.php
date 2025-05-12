@@ -304,7 +304,7 @@ class WasteItemSeeder extends Seeder
             ],
             // Green Glass
             [
-                'waste_type_id' => 6,
+                'waste_type_id' => 3,
                 'name' => 'Wine Bottle',
                 'description' => 'Green glass bottles used for storing wine.',
                 'recyclable' => true,
@@ -323,7 +323,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 6,
+                'waste_type_id' => 3,
                 'name' => 'Olive Oil Bottle',
                 'description' => 'Green glass bottles used for storing olive oil and other cooking oils.',
                 'recyclable' => true,
@@ -342,7 +342,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 6,
+                'waste_type_id' => 3,
                 'name' => 'Green Glass Jar',
                 'description' => 'Glass jars made from green glass, typically used for preserves or sauces.',
                 'recyclable' => true,
@@ -362,7 +362,7 @@ class WasteItemSeeder extends Seeder
             ],
             // Metal
             [
-                'waste_type_id' => 7,
+                'waste_type_id' => 6,
                 'name' => 'Aluminum Can',
                 'description' => 'Cans made of aluminum used for beverages like soda and energy drinks.',
                 'recyclable' => true,
@@ -381,7 +381,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 7,
+                'waste_type_id' => 6,
                 'name' => 'Steel Can',
                 'description' => 'Steel cans commonly used for food products like soup, beans, and vegetables.',
                 'recyclable' => true,
@@ -400,7 +400,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 7,
+                'waste_type_id' => 6,
                 'name' => 'Scrap Metal',
                 'description' => 'Leftover metal parts, like old tools or scrap from construction.',
                 'recyclable' => true,
@@ -420,7 +420,7 @@ class WasteItemSeeder extends Seeder
             ],
             // Paper
             [
-                'waste_type_id' => 8,
+                'waste_type_id' => 4,
                 'name' => 'Newspaper',
                 'description' => 'Old newspapers used for reading or packaging.',
                 'recyclable' => true,
@@ -439,7 +439,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 8,
+                'waste_type_id' => 4,
                 'name' => 'Magazines',
                 'description' => 'Old magazines that are no longer needed.',
                 'recyclable' => true,
@@ -458,7 +458,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 8,
+                'waste_type_id' => 4,
                 'name' => 'Cardboard Packaging',
                 'description' => 'Used cardboard boxes for packaging products like electronics or food.',
                 'recyclable' => true,
@@ -478,7 +478,7 @@ class WasteItemSeeder extends Seeder
             ],
             // Plastic
             [
-                'waste_type_id' => 9,
+                'waste_type_id' => 7,
                 'name' => 'Plastic Bottle',
                 'description' => 'Single-use plastic bottles for water, soda, or other beverages.',
                 'recyclable' => true,
@@ -498,7 +498,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 9,
+                'waste_type_id' => 7,
                 'name' => 'Plastic Bag',
                 'description' => 'Single-use plastic bags often used for groceries.',
                 'recyclable' => false,
@@ -517,7 +517,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 9,
+                'waste_type_id' => 7,
                 'name' => 'Plastic Straws',
                 'description' => 'Single-use plastic straws used for drinking.',
                 'recyclable' => false,
@@ -536,7 +536,7 @@ class WasteItemSeeder extends Seeder
             ],
             // Shoes
             [
-                'waste_type_id' => 10,
+                'waste_type_id' => 5,
                 'name' => 'Old Sneakers',
                 'description' => 'Worn-out athletic shoes that are no longer wearable.',
                 'recyclable' => true,
@@ -555,7 +555,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 10,
+                'waste_type_id' => 5,
                 'name' => 'Leather Boots',
                 'description' => 'Old leather boots that have worn out over time.',
                 'recyclable' => true,
@@ -574,7 +574,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 10,
+                'waste_type_id' => 5,
                 'name' => 'Worn-out Sandals',
                 'description' => 'Old sandals that are no longer comfortable or suitable for wear.',
                 'recyclable' => true,
@@ -594,7 +594,7 @@ class WasteItemSeeder extends Seeder
             ],
             // Trash
             [
-                'waste_type_id' => 11,
+                'waste_type_id' => 8,
                 'name' => 'Packaging Waste',
                 'description' => 'Excess packaging from food, electronics, or other products that are difficult to recycle.',
                 'recyclable' => false,
@@ -612,7 +612,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 11,
+                'waste_type_id' => 8,
                 'name' => 'Broken Furniture',
                 'description' => 'Old or broken furniture that can’t be reused or repaired.',
                 'recyclable' => true,
@@ -631,7 +631,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 11,
+                'waste_type_id' => 8,
                 'name' => 'Non-recyclable Plastics',
                 'description' => 'Plastic items that cannot be recycled due to mixed materials or lack of recycling programs.',
                 'recyclable' => false,
@@ -650,7 +650,7 @@ class WasteItemSeeder extends Seeder
             ],
             // White Glass
             [
-                'waste_type_id' => 12,
+                'waste_type_id' => 3,
                 'name' => 'Clear Wine Bottle',
                 'description' => 'Clear glass bottles used for wine or spirits.',
                 'recyclable' => true,
@@ -669,7 +669,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 12,
+                'waste_type_id' => 3,
                 'name' => 'Glass Jar',
                 'description' => 'Clear glass jars often used for food products like jam, honey, and sauces.',
                 'recyclable' => true,
@@ -688,7 +688,7 @@ class WasteItemSeeder extends Seeder
                 ],
             ],
             [
-                'waste_type_id' => 12,
+                'waste_type_id' => 3,
                 'name' => 'Clear Glass Bottle',
                 'description' => 'Clear glass bottles typically used for beverages like juices and water.',
                 'recyclable' => true,

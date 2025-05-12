@@ -123,9 +123,8 @@ class PointsController extends Controller
     public function awardRecyclingPoints(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'recycling_history_id' => 'required|exists:recycling_histories,id',
             'material_id' => 'required|exists:materials,id',
-            'quantity' => 'required|numeric|min:0.1',
+            'quantity' => 'required|numeric|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -146,20 +145,8 @@ class PointsController extends Controller
             ], 403);
         }
 
-        $recyclingHistoryId = $request->recycling_history_id;
         $materialId = $request->material_id;
         $quantity = $request->quantity;
-
-        // Find the recycling history record
-        $recyclingHistory = RecyclingHistory::findOrFail($recyclingHistoryId);
-
-        // Check if the user owns this center
-        if ($recyclingHistory->center_id !== $center->id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This recycling history does not belong to your center'
-            ], 403);
-        }
 
         // Get the user who recycled
         $recyclingUser = User::findOrFail($recyclingHistory->user_id);
@@ -189,47 +176,47 @@ class PointsController extends Controller
         // Calculate base points
         $basePoints = (int) round($pointsPerUnit * $quantity);
 
-        // Check for consecutive days bonus
-        $bonusPoints = 0;
-        $consecutiveDays = 1;
-        $bonusConfig = $center->bonusConfig;
+        // // Check for consecutive days bonus
+        // $bonusPoints = 0;
+        // $consecutiveDays = 1;
+        // $bonusConfig = $center->bonusConfig;
 
-        if ($bonusConfig && $bonusConfig->consecutive_days_enabled) {
-            // Get user's recycling history for the past days
-            $now = Carbon::now();
-            $recentHistory = RecyclingHistory::where('user_id', $recyclingUser->id)
-                ->where('center_id', $center->id)
-                ->where('created_at', '<', $now->startOfDay())
-                ->orderBy('created_at', 'desc')
-                ->get()
-                ->groupBy(function ($date) {
-                    return Carbon::parse($date->created_at)->format('Y-m-d');
-                });
+        // if ($bonusConfig && $bonusConfig->consecutive_days_enabled) {
+        //     // Get user's recycling history for the past days
+        //     $now = Carbon::now();
+        //     $recentHistory = RecyclingHistory::where('user_id', $recyclingUser->id)
+        //         ->where('center_id', $center->id)
+        //         ->where('created_at', '<', $now->startOfDay())
+        //         ->orderBy('created_at', 'desc')
+        //         ->get()
+        //         ->groupBy(function ($date) {
+        //             return Carbon::parse($date->created_at)->format('Y-m-d');
+        //         });
 
-            // Count consecutive days up to the maximum
-            $checkDate = Carbon::now()->subDay();
-            $maxDays = $bonusConfig->max_consecutive_days;
+        //     // Count consecutive days up to the maximum
+        //     $checkDate = Carbon::now()->subDay();
+        //     $maxDays = $bonusConfig->max_consecutive_days;
 
-            while ($consecutiveDays < $maxDays) {
-                $dateKey = $checkDate->format('Y-m-d');
+        //     while ($consecutiveDays < $maxDays) {
+        //         $dateKey = $checkDate->format('Y-m-d');
 
-                if (isset($recentHistory[$dateKey])) {
-                    $consecutiveDays++;
-                    $checkDate->subDay();
-                } else {
-                    break;
-                }
-            }
+        //         if (isset($recentHistory[$dateKey])) {
+        //             $consecutiveDays++;
+        //             $checkDate->subDay();
+        //         } else {
+        //             break;
+        //         }
+        //     }
 
-            // Calculate bonus if consecutive days > 1
-            if ($consecutiveDays > 1) {
-                $bonusMultiplier = $bonusConfig->consecutive_days_bonus * ($consecutiveDays - 1);
-                $bonusPoints = (int) round($basePoints * $bonusMultiplier);
-            }
-        }
+        //     // Calculate bonus if consecutive days > 1
+        //     if ($consecutiveDays > 1) {
+        //         $bonusMultiplier = $bonusConfig->consecutive_days_bonus * ($consecutiveDays - 1);
+        //         $bonusPoints = (int) round($basePoints * $bonusMultiplier);
+        //     }
+        // }
 
         // Total points to award
-        $totalPoints = $basePoints + $bonusPoints;
+        $totalPoints = $basePoints;
 
         DB::beginTransaction();
 
@@ -439,19 +426,19 @@ class PointsController extends Controller
             }
 
             // Update bonus configuration if provided
-            if ($request->has('bonus_config')) {
-                $bonusConfig = $request->bonus_config;
+            // if ($request->has('bonus_config')) {
+            //     $bonusConfig = $request->bonus_config;
 
-                // Create or update bonus config
-                $center->bonusConfig()->updateOrCreate(
-                    ['center_id' => $center->id],
-                    [
-                        'consecutive_days_enabled' => $bonusConfig['consecutive_days_enabled'] ?? false,
-                        'consecutive_days_bonus' => $bonusConfig['consecutive_days_bonus'] ?? 0.5,
-                        'max_consecutive_days' => $bonusConfig['max_consecutive_days'] ?? 5,
-                    ]
-                );
-            }
+            //     // Create or update bonus config
+            //     $center->bonusConfig()->updateOrCreate(
+            //         ['center_id' => $center->id],
+            //         [
+            //             'consecutive_days_enabled' => $bonusConfig['consecutive_days_enabled'] ?? false,
+            //             'consecutive_days_bonus' => $bonusConfig['consecutive_days_bonus'] ?? 0.5,
+            //             'max_consecutive_days' => $bonusConfig['max_consecutive_days'] ?? 5,
+            //         ]
+            //     );
+            // }
 
             $center->save();
 

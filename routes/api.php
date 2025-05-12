@@ -47,6 +47,21 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 // Waste classification - public
 Route::post('/predict', [WasteClassificationController::class, 'predict']);
 
+// Public resources
+Route::get('/waste-types', [WasteTypeController::class, 'index']);
+Route::get('/waste-types/{id}', [WasteTypeController::class, 'show']);
+
+Route::get('/waste-items', [WasteItemController::class, 'index']);
+Route::get('/waste-items/{id}', [WasteItemController::class, 'show']);
+
+Route::get('/recycling-centers', [RecyclingCenterController::class, 'index']);
+Route::get('/recycling-centers/{id}', [RecyclingCenterController::class, 'show']);
+
+Route::get('/cleanup-events', [CleanupEventController::class, 'index']);
+Route::get('/cleanup-events/{id}', [CleanupEventController::class, 'show']);
+
+Route::get('/users/{id}', [UserController::class, 'getUserById']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     // Auth
@@ -73,8 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Center registration and status
     Route::post('/recycling-centers/register', [CenterController::class, 'register']);
-    Route::get('/recycling-centers/status', [CenterController::class, 'checkStatus']);
-    Route::get('/recycling-centers/my-center', [CenterController::class, 'getMyCenterDetails']);
+    Route::get('/recycling-centers/my-center/{id}', [CenterController::class, 'getMyCenterDetails']);
+    Route::get('/recycling-centers/status/{id}', [CenterController::class, 'checkStatus']);
 
 
     // Rewards System
@@ -98,40 +113,40 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/points/leaderboard', [PointsController::class, 'getLeaderboard']);
 
     // Center Management Routes (protected by additional middleware)
-    Route::middleware('center.owner')->group(function () {
+    // Route::middleware('center.owner')->group(function () {
 
-        // Manage recycling center
-        Route::post('/recycling-centers', [RecyclingCenterController::class, 'store']);
-        Route::put('/recycling-centers/{id}', [RecyclingCenterController::class, 'update']);
-        Route::delete('/recycling-centers/{id}', [RecyclingCenterController::class, 'destroy']);
-        Route::post('/recycling-centers/{id}/activate', [RecyclingCenterController::class, 'activate']);
-        Route::post('/recycling-centers/{id}/deactivate', [RecyclingCenterController::class, 'deactivate']);
+    // Manage recycling center
+    Route::post('/recycling-centers', [RecyclingCenterController::class, 'store']);
+    Route::put('/recycling-centers/{id}', [RecyclingCenterController::class, 'update']);
+    Route::delete('/recycling-centers/{id}', [RecyclingCenterController::class, 'destroy']);
+    Route::post('/recycling-centers/{id}/activate', [RecyclingCenterController::class, 'activate']);
+    Route::post('/recycling-centers/{id}/deactivate', [RecyclingCenterController::class, 'deactivate']);
 
-        // Manage waste items and types
-        Route::post('/waste-types', [WasteTypeController::class, 'store']);
-        Route::put('/waste-types/{id}', [WasteTypeController::class, 'update']);
-        Route::delete('/waste-types/{id}', [WasteTypeController::class, 'destroy']);
-        Route::post('/waste-items', [WasteItemController::class, 'store']);
-        Route::put('/waste-items/{id}', [WasteItemController::class, 'update']);
-        Route::delete('/waste-items/{id}', [WasteItemController::class, 'destroy']);
+    // Manage waste items and types
+    Route::post('/waste-types', [WasteTypeController::class, 'store']);
+    Route::put('/waste-types/{id}', [WasteTypeController::class, 'update']);
+    Route::delete('/waste-types/{id}', [WasteTypeController::class, 'destroy']);
+    Route::post('/waste-items', [WasteItemController::class, 'store']);
+    Route::put('/waste-items/{id}', [WasteItemController::class, 'update']);
+    Route::delete('/waste-items/{id}', [WasteItemController::class, 'destroy']);
 
-        // Manage rewards
-        Route::get('/rewards/center', [RewardController::class, 'centerRewards']);
-        Route::post('/rewards', [RewardController::class, 'store']);
-        Route::put('/rewards/{id}', [RewardController::class, 'update']);
-        Route::delete('/rewards/{id}', [RewardController::class, 'destroy']);
+    // Manage rewards
+    Route::get('/center/rewards', [RewardController::class, 'centerRewards']);
+    Route::post('/rewards', [RewardController::class, 'store']);
+    Route::put('/rewards/{id}', [RewardController::class, 'update']);
+    Route::delete('/rewards/{id}', [RewardController::class, 'destroy']);
 
-        // Manage redemptions
-        Route::get('/rewards/redemptions/pending', [RedemptionController::class, 'getPendingRedemptions']);
-        Route::post('/rewards/redemptions/{id}/process', [RedemptionController::class, 'processRedemption']);
-        Route::get('/rewards/statistics', [RedemptionController::class, 'getRedemptionStats']);
+    // Manage redemptions
+    Route::get('/rewards/redemptions/pending', [RedemptionController::class, 'getPendingRedemptions']);
+    Route::post('/rewards/redemptions/{id}/process', [RedemptionController::class, 'processRedemption']);
+    Route::get('/rewards/statistics', [RedemptionController::class, 'getRedemptionStats']);
 
-        // Manage points
-        Route::post('/points/award', [PointsController::class, 'awardPoints']);
-        Route::post('/points/recycling', [PointsController::class, 'awardRecyclingPoints']);
-        Route::post('/points/materials/configure', [PointsController::class, 'configureMaterialPoints']);
-        Route::get('/points/statistics', [PointsController::class, 'getPointsStatistics']);
-    });
+    // Manage points
+    Route::post('/points/award', [PointsController::class, 'awardPoints']);
+    Route::post('/points/recycling', [PointsController::class, 'awardRecyclingPoints']);
+    Route::post('/points/materials/configure', [PointsController::class, 'configureMaterialPoints']);
+    Route::get('/points/statistics', [PointsController::class, 'getPointsStatistics']);
+    // });
 
     Route::prefix('admin')->group(function () {
         // Waste Types management
@@ -156,17 +171,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-// Public resources
-Route::get('/waste-types', [WasteTypeController::class, 'index']);
-Route::get('/waste-types/{id}', [WasteTypeController::class, 'show']);
 
-Route::get('/waste-items', [WasteItemController::class, 'index']);
-Route::get('/waste-items/{id}', [WasteItemController::class, 'show']);
-
-Route::get('/recycling-centers', [RecyclingCenterController::class, 'index']);
-Route::get('/recycling-centers/{id}', [RecyclingCenterController::class, 'show']);
-
-Route::get('/cleanup-events', [CleanupEventController::class, 'index']);
-Route::get('/cleanup-events/{id}', [CleanupEventController::class, 'show']);
 
 // Admin routes (would be protected with admin middleware in a real app)

@@ -14,14 +14,16 @@ class WasteTypeSeeder extends Seeder
     public function run(): void
     {
         $wasteTypes = [
+            // 1
             [
-                'name' => 'Battery',
+                'name' => 'Hazardous',
                 'icon' => '🔋',
                 'color' => '#607D8B',
-                'description' => 'Battery waste includes disposable and rechargeable batteries that contain chemicals that can be harmful to the environment if not properly disposed of.',
-                'class' => 'battery',
-                'tips' => 'Take batteries to designated collection points. Never throw them in regular trash. Many electronics stores offer battery recycling programs.'
+                'description' => 'Hazardous waste includes items like batteries, chemicals, and other substances that can be harmful to the environment or human health if not properly disposed of.',
+                'class' => 'hazardous',
+                'tips' => 'Take hazardous waste to designated collection points. Never throw them in regular trash. Many electronics stores offer battery recycling programs.'
             ],
+            // 2
             [
                 'name' => 'Biological',
                 'icon' => '🍎',
@@ -30,46 +32,16 @@ class WasteTypeSeeder extends Seeder
                 'class' => 'biological',
                 'tips' => 'Start a compost bin for food scraps and yard waste. Keep meat and dairy products out of home compost piles to avoid pests.'
             ],
+            // 3
             [
-                'name' => 'Brown Glass',
-                'icon' => '🍸',
-                'color' => '#8e44ad',
-                'description' => 'Brown glass waste includes bottles, jars, and other items made from brown glass that can be recycled and reused.',
-                'class' => 'brown-glass',
-                'tips' => 'Rinse containers before recycling. Remove caps and lids. Brown glass is often used for beer bottles and some medicine containers.'
-            ],
-            [
-                'name' => 'Cardboard',
-                'icon' => '📦',
-                'color' => '#f39c12',
-                'description' => 'Cardboard waste includes packaging materials, shipping boxes, and other items made from cardboard that can be recycled.',
-                'class' => 'cardboard',
-                'tips' => 'Flatten boxes to save space. Remove any plastic or styrofoam inserts. Keep cardboard dry to maintain recyclability.'
-            ],
-            [
-                'name' => 'Clothes',
-                'icon' => '👗',
-                'color' => '#FF4081',
-                'description' => 'Clothing waste includes old clothes and fabrics that can be reused, repurposed, or recycled.',
-                'class' => 'clothes',
-                'tips' => 'Donate wearable items to charity. Use old t-shirts as cleaning rags. Look for textile recycling programs for unwearable items.'
-            ],
-            [
-                'name' => 'Green Glass',
+                'name' => 'Glass',
                 'icon' => '🍷',
                 'color' => '#2ecc71',
-                'description' => 'Green glass waste includes bottles, jars, and other items made from green glass that can be recycled and reused.',
-                'class' => 'green-glass',
-                'tips' => 'Rinse thoroughly before recycling. Green glass is commonly used for wine bottles and some food containers.'
+                'description' => 'Glass waste includes all types of glass containers like bottles, jars, and other glass items that can be recycled and reused.',
+                'class' => 'glass',
+                'tips' => 'Rinse thoroughly before recycling. Remove caps and lids. Glass is highly recyclable and can be made into new glass products.'
             ],
-            [
-                'name' => 'Metal',
-                'icon' => '🥫',
-                'color' => '#95a5a6',
-                'description' => 'Metal waste includes aluminum cans, steel containers, scrap metal, and other metallic items that can be melted down and reused.',
-                'class' => 'metal',
-                'tips' => 'Rinse food containers. Crush aluminum cans to save space. Metal is infinitely recyclable without loss of quality.'
-            ],
+            // 4
             [
                 'name' => 'Paper',
                 'icon' => '📄',
@@ -78,6 +50,25 @@ class WasteTypeSeeder extends Seeder
                 'class' => 'paper',
                 'tips' => 'Keep paper dry and clean. Remove any plastic coverings from magazines. Shredded paper can often be composted if it\'s not recyclable in your area.'
             ],
+            // 5
+            [
+                'name' => 'Textiles',
+                'icon' => '👗',
+                'color' => '#FF4081',
+                'description' => 'Textile waste includes old clothes, fabrics, shoes, and other materials that can be reused, repurposed, or recycled.',
+                'class' => 'textiles',
+                'tips' => 'Donate wearable items to charity. Use old t-shirts as cleaning rags. Some companies have take-back programs for recycling old textiles.'
+            ],
+            // 6
+            [
+                'name' => 'Metal',
+                'icon' => '🥫',
+                'color' => '#95a5a6',
+                'description' => 'Metal waste includes aluminum cans, steel containers, scrap metal, and other metallic items that can be melted down and reused.',
+                'class' => 'metal',
+                'tips' => 'Rinse food containers. Crush aluminum cans to save space. Metal is infinitely recyclable without loss of quality.'
+            ],
+            // 7
             [
                 'name' => 'Plastic',
                 'icon' => '🧴',
@@ -86,29 +77,32 @@ class WasteTypeSeeder extends Seeder
                 'class' => 'plastic',
                 'tips' => 'Check the recycling number (1-7) on the bottom of containers to determine recyclability in your area. Rinse containers and remove caps.'
             ],
+            // 8
             [
-                'name' => 'Shoes',
-                'icon' => '👟',
-                'color' => '#7B1FA2',
-                'description' => 'Old shoes and footwear that can be reused, repaired, or recycled.',
-                'class' => 'shoes',
-                'tips' => 'Donate wearable shoes to charity. Some athletic shoe companies have take-back programs for recycling old sneakers.'
-            ],
-            [
-                'name' => 'Trash',
+                'name' => 'General Waste',
                 'icon' => '🗑️',
                 'color' => '#757575',
-                'description' => 'Miscellaneous waste that doesn\'t fit into other categories.',
-                'class' => 'trash',
+                'description' => 'General waste refers to non-recyclable materials or waste that does not fit into other specific categories. It typically includes miscellaneous items that need to be disposed of.',
+                'class' => 'general-waste',
                 'tips' => 'Try to minimize general waste by properly sorting recyclables. Consider if items can be repurposed before throwing them away.'
             ],
+            // 9
             [
-                'name' => 'White Glass',
-                'icon' => '🍷',
-                'color' => '#bdc3c7',
-                'description' => 'White glass waste includes bottles, jars, and other items made from white glass that can be recycled and reused.',
-                'class' => 'white-glass',
-                'tips' => 'Rinse containers thoroughly. Remove metal lids. Clear glass is highly recyclable and can be made into new glass products.'
+                'name' => 'Electronic Waste',
+                'icon' => '💻',
+                'color' => '#FF6347',
+                'description' => 'E-waste includes discarded electronic devices like computers, phones, and batteries.',
+                'class' => 'e-waste',
+                'tips' => 'Recycle electronics at certified e-waste facilities. Don\'t throw old electronics in the trash as they contain harmful substances.'
+            ],
+            // 10
+            [
+                'name' => 'Non Waste',
+                'icon' => '♻️',
+                'color' => '#1abc9c',
+                'description' => 'Non-waste refers to items that are either reusable, repurposed, or do not require disposal.',
+                'class' => 'non-waste',
+                'tips' => 'Focus on reusing and repurposing materials rather than discarding them. Look for sustainable alternatives to reduce waste.'
             ]
         ];
 

@@ -45,10 +45,10 @@ class RewardController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('center', function ($q) use ($search) {
-                      $q->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('center', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -73,7 +73,7 @@ class RewardController extends Controller
                 $query->orderBy('points_cost', 'desc');
                 break;
             case 'popular':
-                $query->withCount(['redemptions' => function($q) {
+                $query->withCount(['redemptions' => function ($q) {
                     $q->where('status', 'approved');
                 }])->orderByDesc('redemptions_count');
                 break;
@@ -213,10 +213,11 @@ class RewardController extends Controller
         }
 
         // Handle image upload if provided
-        $imageUrl = null;
+        $filename = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/rewards');
-            $imageUrl = Storage::url($imagePath);
+            $image = $request->file('image');
+            $filename = $image->getClientOriginalName();  // Get the original filename
+            $image->storeAs('rewards', $filename);  // Store the file in the rewards directory
         }
 
         $reward = new Reward([
@@ -227,7 +228,7 @@ class RewardController extends Controller
             'points_cost' => $request->points_cost,
             'quantity' => $request->quantity,
             'expiry_date' => $request->expiry_date,
-            'image' => $imageUrl,
+            'image' => $filename,
             'terms' => $request->terms,
             'redemption_instructions' => $request->redemption_instructions,
             'is_active' => $request->input('is_active', true),

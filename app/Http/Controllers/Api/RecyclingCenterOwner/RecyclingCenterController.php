@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\WasteType;
 use App\Models\MaterialPointConfig;
 use App\Models\BonusConfig;
+use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -28,14 +29,14 @@ class RecyclingCenterController extends Controller
 
         // Only show active and approved centers to general users
         $query->where('is_active', true)
-              ->where('status', 'approved');
+            ->where('status', 'approved');
 
         // Filter by search query
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%");
+                    ->orWhere('address', 'like', "%{$search}%");
             });
         }
 
@@ -91,7 +92,12 @@ class RecyclingCenterController extends Controller
 
         // Only return basic information for public access
         $centers = $query->select([
-            'id', 'name', 'address', 'latitude', 'longitude', 'image'
+            'id',
+            'name',
+            'address',
+            'latitude',
+            'longitude',
+            'image'
         ])->get();
 
         return response()->json([
@@ -201,7 +207,7 @@ class RecyclingCenterController extends Controller
             }
 
             // Create default material point configs
-            $materials = \App\Models\Material::all();
+            $materials = Material::all();
             foreach ($materials as $material) {
                 MaterialPointConfig::create([
                     'center_id' => $center->id,
@@ -213,17 +219,12 @@ class RecyclingCenterController extends Controller
             }
 
             // Create default bonus config
-            BonusConfig::create([
-                'center_id' => $center->id,
-                'consecutive_days_enabled' => false,
-                'consecutive_days_bonus' => 0.5,
-                'max_consecutive_days' => 5,
-            ]);
-
-            // Update user role
-            // if (!$user->hasRole('center_owner')) {
-            //     $user->assignRole('center_owner');
-            // }
+            // BonusConfig::create([
+            //     'center_id' => $center->id,
+            //     'consecutive_days_enabled' => false,
+            //     'consecutive_days_bonus' => 0.5,
+            //     'max_consecutive_days' => 5,
+            // ]);
 
             DB::commit();
 
@@ -253,9 +254,9 @@ class RecyclingCenterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function checkStatus()
+    public function checkStatus($id)
     {
-        $user = Auth::user();
+        $user = User::findOrFail($id);
         $center = $user->recyclingCenter;
 
         if (!$center) {
@@ -287,9 +288,9 @@ class RecyclingCenterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getMyCenterDetails()
+    public function getMyCenterDetails($id)
     {
-        $user = Auth::user();
+        $user = User::findOrFail($id);
         $center = $user->recyclingCenter;
 
         if (!$center) {
@@ -378,8 +379,14 @@ class RecyclingCenterController extends Controller
 
         // Update fields that are provided
         $center->fill($request->only([
-            'name', 'address', 'phone', 'website', 'description', 
-            'latitude', 'longitude', 'is_active'
+            'name',
+            'address',
+            'phone',
+            'website',
+            'description',
+            'latitude',
+            'longitude',
+            'is_active'
         ]));
 
         DB::beginTransaction();
@@ -498,9 +505,9 @@ class RecyclingCenterController extends Controller
         }
 
         // Check if there is any activity already recorded for this center
-        $hasActivity = $center->rewards()->exists() || 
-                       $center->materialPointConfigs()->exists() ||
-                       $center->pointsTransactions()->exists();
+        $hasActivity = $center->rewards()->exists() ||
+            $center->materialPointConfigs()->exists() ||
+            $center->pointsTransactions()->exists();
 
         if ($hasActivity) {
             return response()->json([
@@ -629,9 +636,9 @@ class RecyclingCenterController extends Controller
             'approved_centers' => RecyclingCenter::where('status', 'approved')->count(),
             'centers_by_waste_type' => WasteType::withCount('recyclingCenters')->get(),
             'recent_registrations' => RecyclingCenter::with('user:id,name,email')
-                                    ->orderBy('created_at', 'desc')
-                                    ->take(5)
-                                    ->get(),
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get(),
         ];
 
         return response()->json([

@@ -101,7 +101,7 @@ class RedemptionController extends Controller
      */
     public function history(Request $request)
     {
-        $user = Auth::user();
+        $user = User::findOrFail($request->id);
         $status = $request->input('status');
 
         $query = RewardRedemption::with(['reward', 'reward.center'])
