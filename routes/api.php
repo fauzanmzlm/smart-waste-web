@@ -24,13 +24,13 @@
 
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\Api\ClassificationHistoryController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\RecyclingCenterOwner\RecyclingCenterController as CenterController;
 use App\Http\Controllers\API\RecyclingCenterController;
 use App\Http\Controllers\API\WasteTypeController;
 use App\Http\Controllers\API\WasteItemController;
 use App\Http\Controllers\API\RecyclingHistoryController;
-use App\Http\Controllers\API\CleanupEventController;
 use App\Http\Controllers\Api\PointsController;
 use App\Http\Controllers\Api\RedemptionController;
 use App\Http\Controllers\Api\RewardController;
@@ -45,7 +45,7 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Waste classification - public
-Route::post('/predict', [WasteClassificationController::class, 'predict']);
+// Route::post('/predict', [WasteClassificationController::class, 'predict']);
 
 // Public resources
 Route::get('/waste-types', [WasteTypeController::class, 'index']);
@@ -57,9 +57,6 @@ Route::get('/waste-items/{id}', [WasteItemController::class, 'show']);
 Route::get('/recycling-centers', [RecyclingCenterController::class, 'index']);
 Route::get('/recycling-centers/{id}', [RecyclingCenterController::class, 'show']);
 
-Route::get('/cleanup-events', [CleanupEventController::class, 'index']);
-Route::get('/cleanup-events/{id}', [CleanupEventController::class, 'show']);
-
 Route::get('/users/{id}', [UserController::class, 'getUserById']);
 
 // Protected routes
@@ -70,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // User profile
     Route::get('/profile', [UserController::class, 'profile']);
+    Route::get('/user-statistics', [UserController::class, 'userStatistics']);
     Route::post('/profile', [UserController::class, 'updateProfile']);
     Route::post('/profile/image', [UserController::class, 'uploadProfileImage']);
     Route::delete('/profile', [UserController::class, 'deleteAccount']);
@@ -77,6 +75,13 @@ Route::middleware('auth:sanctum')->group(function () {
     // User account & preferences
     Route::get('/account', [UserController::class, 'getUserAccount']);
     Route::post('/account/preferences', [UserController::class, 'updatePreferences']);
+
+    // Classification History
+    Route::get('/classification-history', [ClassificationHistoryController::class, 'getUserHistory']);
+    Route::post('/classification-history', [ClassificationHistoryController::class, 'store']);
+    Route::get('/classification-history/{id}', [ClassificationHistoryController::class, 'show']);
+    Route::delete('/classification-history/{id}', [ClassificationHistoryController::class, 'destroy']);
+    Route::get('/classification-stats', [ClassificationHistoryController::class, 'stats']);
 
     // Recycling History
     Route::get('/recycling-history', [RecyclingHistoryController::class, 'index']);
@@ -87,8 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     // Center registration and status
+    Route::get('/center/recycling-centers/my-center', [CenterController::class, 'getMyCenterDetails']);
     Route::post('/recycling-centers/register', [CenterController::class, 'register']);
-    Route::get('/recycling-centers/my-center/{id}', [CenterController::class, 'getMyCenterDetails']);
     Route::get('/recycling-centers/status/{id}', [CenterController::class, 'checkStatus']);
 
 
@@ -96,13 +101,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rewards (for users)
     Route::get('/rewards', [RewardController::class, 'index']);
-    Route::get('/rewards/{id}', [RewardController::class, 'show']);
     Route::get('/rewards/featured', [RewardController::class, 'featured']);
-
-    // Redemptions (for users)
-    Route::post('/rewards/{id}/redeem', [RedemptionController::class, 'redeem']);
     Route::get('/rewards/redemptions', [RedemptionController::class, 'history']);
     Route::get('/rewards/redemptions/{id}', [RedemptionController::class, 'show']);
+    Route::post('/rewards/{id}/redeem', [RedemptionController::class, 'redeem']);
+    Route::get('/rewards/{id}', [RewardController::class, 'show']);
 
     // Points (for users)
     Route::get('/points/balance', [PointsController::class, 'getBalance']);
@@ -143,7 +146,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Manage points
     Route::post('/points/award', [PointsController::class, 'awardPoints']);
-    Route::post('/points/recycling', [PointsController::class, 'awardRecyclingPoints']);
+    // Route::post('/points/recycling', [PointsController::class, 'awardRecyclingPoints']);
+
+    Route::post('/points/recycling', [PointsController::class, 'recyclingWithPoints']);
+
     Route::post('/points/materials/configure', [PointsController::class, 'configureMaterialPoints']);
     Route::get('/points/statistics', [PointsController::class, 'getPointsStatistics']);
     // });
@@ -163,11 +169,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/recycling-centers', [RecyclingCenterController::class, 'store']);
         Route::put('/recycling-centers/{id}', [RecyclingCenterController::class, 'update']);
         Route::delete('/recycling-centers/{id}', [RecyclingCenterController::class, 'destroy']);
-
-        // Cleanup Events management
-        Route::post('/cleanup-events', [CleanupEventController::class, 'store']);
-        Route::put('/cleanup-events/{id}', [CleanupEventController::class, 'update']);
-        Route::delete('/cleanup-events/{id}', [CleanupEventController::class, 'destroy']);
     });
 });
 

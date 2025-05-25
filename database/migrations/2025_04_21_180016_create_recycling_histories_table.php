@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('recycling_histories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('waste_item_id')->constrained()->onDelete('cascade');
-            $table->string('location')->nullable();
-            $table->string('image')->nullable();
-            $table->integer('points_earned')->default(0);
+            $table->foreignId('center_id')->constrained('recycling_centers')->onDelete('cascade');
+            $table->foreignId('waste_item_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('waste_name')->nullable();
+            $table->decimal('quantity', 8, 2)->nullable();  // Assuming quantity can have decimals
+            $table->string('unit')->nullable();
+            $table->string('image')->nullable();  // Image field can be nullable
             $table->timestamps();
         });
     }

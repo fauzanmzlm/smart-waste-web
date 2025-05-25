@@ -38,31 +38,6 @@ class RecyclingCenter extends Model
         return $this->belongsToMany(WasteType::class, 'recycling_center_waste_type');
     }
 
-    // Calculate distance from given coordinates
-    public function getDistanceAttribute($lat = null, $lng = null)
-    {
-        if (!$lat || !$lng) {
-            return null;
-        }
-
-        // Earth radius in miles
-        $earthRadius = 3959;
-
-        $lat1 = deg2rad($this->latitude);
-        $lng1 = deg2rad($this->longitude);
-        $lat2 = deg2rad($lat);
-        $lng2 = deg2rad($lng);
-
-        $dLat = $lat2 - $lat1;
-        $dLng = $lng2 - $lng1;
-
-        $a = sin($dLat / 2) * sin($dLat / 2) + cos($lat1) * cos($lat2) * sin($dLng / 2) * sin($dLng / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        $distance = $earthRadius * $c;
-
-        return round($distance, 1);
-    }
-
 
     /**
      * Get the rewards offered by this center.
@@ -73,27 +48,11 @@ class RecyclingCenter extends Model
     }
 
     /**
-     * Get the material point configurations for this center.
-     */
-    public function materialPointConfigs()
-    {
-        return $this->hasMany(MaterialPointConfig::class, 'center_id');
-    }
-
-    /**
      * Get the points transactions for this center.
      */
     public function pointsTransactions()
     {
         return $this->hasMany(PointsTransaction::class, 'center_id');
-    }
-
-    /**
-     * Get the bonus configuration for this center.
-     */
-    public function bonusConfig()
-    {
-        return $this->hasOne(BonusConfig::class, 'center_id');
     }
 
     /**

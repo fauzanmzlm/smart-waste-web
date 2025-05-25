@@ -8,15 +8,14 @@ use Filament\Widgets\ChartWidget;
 class RewardsRedemptionChart extends ChartWidget
 {
     protected static ?string $heading = 'Rewards Redemption Status';
-    
     protected static ?string $pollingInterval = '60s';
-    
+
     protected function getData(): array
     {
         $pendingCount = RewardRedemption::where('status', 'pending')->count();
         $approvedCount = RewardRedemption::where('status', 'approved')->count();
         $rejectedCount = RewardRedemption::where('status', 'rejected')->count();
-        
+
         return [
             'datasets' => [
                 [
@@ -32,7 +31,7 @@ class RewardsRedemptionChart extends ChartWidget
     {
         return 'doughnut';
     }
-    
+
     protected function getOptions(): array
     {
         return [

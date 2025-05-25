@@ -174,10 +174,10 @@ class RecyclingCenterController extends Controller
         }
 
         // Handle image upload
-        $imageUrl = null;
+        $filePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/recycling_centers');
-            $imageUrl = Storage::url($imagePath);
+            $image = $request->file('image');
+            $filePath = $image->storeAs('recycling_centers', $image->getClientOriginalName());
         }
 
         DB::beginTransaction();
@@ -193,7 +193,7 @@ class RecyclingCenterController extends Controller
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'hours' => $hours,
-                'image' => $imageUrl,
+                'image' => $filePath,
                 'status' => 'pending', // New centers start as pending
                 'is_active' => false,
                 'user_id' => $user->id,
@@ -205,26 +205,6 @@ class RecyclingCenterController extends Controller
             if ($request->has('waste_types')) {
                 $center->wasteTypes()->attach($request->waste_types);
             }
-
-            // Create default material point configs
-            $materials = Material::all();
-            foreach ($materials as $material) {
-                MaterialPointConfig::create([
-                    'center_id' => $center->id,
-                    'material_id' => $material->id,
-                    'points' => $material->default_points,
-                    'is_enabled' => true,
-                    'multiplier' => 1.0,
-                ]);
-            }
-
-            // Create default bonus config
-            // BonusConfig::create([
-            //     'center_id' => $center->id,
-            //     'consecutive_days_enabled' => false,
-            //     'consecutive_days_bonus' => 0.5,
-            //     'max_consecutive_days' => 5,
-            // ]);
 
             DB::commit();
 
@@ -288,9 +268,9 @@ class RecyclingCenterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getMyCenterDetails($id)
+    public function getMyCenterDetails()
     {
-        $user = User::findOrFail($id);
+        $user = User::findOrFail(Auth::id());
         $center = $user->recyclingCenter;
 
         if (!$center) {
@@ -300,8 +280,8 @@ class RecyclingCenterController extends Controller
             ], 404);
         }
 
-        // Load waste types and bonus config
-        $center->load('wasteTypes', 'bonusConfig', 'materialPointConfigs.material');
+        // Load waste types
+        $center->load('wasteTypes');
 
         return response()->json([
             'success' => true,

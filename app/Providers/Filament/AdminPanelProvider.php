@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\StatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -40,6 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                StatsOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -63,7 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ->profile()
             ->brandName('Smart Waste Admin')
             // ->brandLogo('https://placehold.co/1200x400')
-            ->brandLogo(asset('assets/images/smart-waste-2.png'))
+            ->brandLogo(asset('assets/images/smartwaste-logo.png'))
             ->favicon('https://placehold.co/60x60')
             // ->favicon(asset('assets/images/favicon.png'))
             ->navigationGroups([

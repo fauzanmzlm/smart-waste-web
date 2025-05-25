@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -134,7 +135,7 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $preferences = $user->preferences;
-        $totalPoints = $user->getTotalPointsAttribute();
+        $totalPoints = $user->getPointsBalanceAttribute();
         $itemsRecycled = $user->getItemsRecycledAttribute();
 
         return response()->json([
@@ -232,5 +233,22 @@ class UserController extends Controller
         $accountAgeInWeeks = max(1, $user->created_at->diffInWeeks(now()) + 1);
 
         return round($totalItems / $accountAgeInWeeks, 1);
+    }
+
+    public function userStatistics()
+    {
+        $user = User::find(Auth::id());
+        $itemsRecycled = $user->getItemsRecycledAttribute();
+        $totalClassifications = $user->getTotalClassificationsAttribute();
+        $totalPoints = $user->getPointsBalanceAttribute();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'totalItemsRecycled' => $itemsRecycled,
+                'totalClassifications' => $totalClassifications,
+                'totalPoints' => $totalPoints,
+            ]
+        ]);
     }
 }

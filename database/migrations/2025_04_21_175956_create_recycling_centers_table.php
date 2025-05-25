@@ -26,7 +26,6 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->text('rejection_reason')->nullable();
             $table->boolean('is_active')->default(false);
-            $table->float('points_multiplier')->default(1.0);
             $table->timestamps();
             $table->softDeletes();
         });

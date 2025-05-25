@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('quantity')->nullable();
             $table->timestamp('expiry_date')->nullable();
             $table->string('image')->nullable();
+            $table->string('fake_image_url')->nullable();
             $table->text('terms')->nullable();
             $table->text('redemption_instructions')->nullable();
             $table->boolean('is_active')->default(true);

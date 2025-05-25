@@ -111,7 +111,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Password::min(8)],
+            'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
         if ($validator->fails()) {
@@ -122,10 +122,14 @@ class AuthController extends Controller
             ], 422);
         }
 
+        // Generate random loyalty_id with format: LOY-XXXXXXXX (X = random digits)
+        $loyaltyId = 'SW-' . str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'loyalty_id' => $loyaltyId,
         ]);
 
         // Create default user preferences
@@ -141,7 +145,7 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'User registered successfully',
             'user' => $user
-        ], 201);
+        ]);
     }
 
     /**

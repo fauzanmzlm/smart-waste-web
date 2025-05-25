@@ -11,10 +11,12 @@ class RecyclingHistory extends Model
 
     protected $fillable = [
         'user_id',
+        'center_id',
         'waste_item_id',
-        'location',
+        'waste_name',
+        'quantity',
+        'unit',
         'image',
-        'points_earned',
     ];
 
     public function user()
@@ -22,8 +24,19 @@ class RecyclingHistory extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function center()
+    {
+        return $this->belongsTo(RecyclingCenter::class);
+    }
+
     public function wasteItem()
     {
         return $this->belongsTo(WasteItem::class);
+    }
+
+    // Add this method for the polymorphic relationship with PointsTransaction
+    public function pointsTransaction()
+    {
+        return $this->morphOne(PointsTransaction::class, 'transactionable');
     }
 }

@@ -3,29 +3,50 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
+use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\LatestUsers;
+use App\Filament\Widgets\PendingCentersWidget; // New widget
+use App\Filament\Widgets\RecyclingActivitiesChart; // Enhanced chart
+use App\Filament\Widgets\RewardsRedemptionChart;
+use App\Filament\Widgets\WasteTypeDistributionChart; // New chart
+use App\Filament\Widgets\UserGrowthChart; // New chart
+use App\Filament\Widgets\TopRecyclingCentersTable; // New widget
+use App\Filament\Widgets\PointsLeaderboardWidget; // New widget
 
 class Dashboard extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-home';
-
     protected static string $view = 'filament.pages.dashboard';
+
+    // Only include widgets in one place to avoid duplication
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            StatsOverview::class,
+            UserGrowthChart::class,
+            RecyclingActivitiesChart::class,
+            WasteTypeDistributionChart::class,
+            RewardsRedemptionChart::class,
+            TopRecyclingCentersTable::class,
+            PendingCentersWidget::class,
+            PointsLeaderboardWidget::class,
+            LatestUsers::class,
+        ];
+    }
 
     public function getWidgets(): array
     {
         return [
-            \App\Filament\Widgets\StatsOverview::class,
-            \App\Filament\Widgets\LatestUsers::class,
-            \App\Filament\Widgets\PendingCentersChart::class,
-            \App\Filament\Widgets\RecyclingActivitiesChart::class,
-            \App\Filament\Widgets\RewardsRedemptionChart::class,
-        ];
-    }
+            // UserGrowthChart::class,
+            // RecyclingActivitiesChart::class,
+            // WasteTypeDistributionChart::class,
+            // RewardsRedemptionChart::class,
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            \App\Filament\Widgets\EventsCalendar::class,
-            \App\Filament\Widgets\StatsOverview::class,
+            // PendingCentersWidget::class,
+
+            // TopRecyclingCentersTable::class,
+            // PointsLeaderboardWidget::class,
+            // LatestUsers::class,
         ];
     }
 }

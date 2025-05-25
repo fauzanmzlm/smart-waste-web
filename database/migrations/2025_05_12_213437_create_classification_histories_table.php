@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('classification_histories', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->text('description')->nullable();
-            $table->string('icon')->nullable();
-            $table->integer('default_points')->default(1);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('waste_type_id')->constrained();
+            $table->string('image')->nullable();
+            $table->float('confidence_score')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('classification_histories');
     }
 };

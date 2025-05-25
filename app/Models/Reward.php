@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,6 +25,7 @@ class Reward extends Model
         'quantity',
         'expiry_date',
         'image',
+        'fake_image_url',
         'terms',
         'redemption_instructions',
         'is_active',
@@ -110,7 +112,7 @@ class Reward extends Model
     {
         return $query->where(function ($query) {
             $query->whereNull('expiry_date')
-                  ->orWhere('expiry_date', '>', now());
+                ->orWhere('expiry_date', '>', now());
         });
     }
 
@@ -124,7 +126,7 @@ class Reward extends Model
     {
         return $query->where(function ($query) {
             $query->whereNull('quantity')
-                  ->orWhereRaw('quantity > (SELECT COUNT(*) FROM reward_redemptions WHERE reward_id = rewards.id AND status != "rejected")');
+                ->orWhereRaw('quantity > (SELECT COUNT(*) FROM reward_redemptions WHERE reward_id = rewards.id AND status != "rejected")');
         });
     }
 
@@ -192,5 +194,17 @@ class Reward extends Model
 
         $usedQuantity = $this->redemptions()->whereIn('status', ['pending', 'approved'])->count();
         return max(0, $this->quantity - $usedQuantity);
+    }
+
+    /**
+     * Get the URL of the reward image.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
+    protected function imageUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, $attributes) => $attributes['image'] ?? $attributes['fake_image_url'],
+        );
     }
 }

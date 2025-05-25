@@ -6,6 +6,7 @@ use App\Models\RecyclingCenter;
 use App\Models\WasteType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon; // Import Carbon for date manipulation
 
 class RecyclingCenterSeeder extends Seeder
 {
@@ -28,10 +29,18 @@ class RecyclingCenterSeeder extends Seeder
         $trashType = WasteType::where('name', 'Trash')->first();
         $whiteGlassType = WasteType::where('name', 'White Glass')->first();
 
+        // Define the date range for 'created_at'
+        $startDate = Carbon::create(2024, 12, 1, 0, 0, 0);
+        $endDate = Carbon::create(2025, 5, 31, 23, 59, 59);
+
+        // Define possible statuses
+        $statuses = ['pending', 'approved', 'rejected'];
+
         // Create centers for each state in Malaysia
         $centers = [
             // Johor
             [
+                'user_id' => 2,
                 'name' => 'Johor Eco Recycling Hub',
                 'address' => '15 Jalan Skudai, Johor Bahru, Johor 81300',
                 'phone' => '(07) 555-1234',
@@ -50,6 +59,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $metalType, $cardboardType],
             ],
             [
+                'user_id' => 2,
                 'name' => 'Muar Green Resources',
                 'address' => '78 Jalan Ibrahim, Muar, Johor 84000',
                 'phone' => '(06) 555-9876',
@@ -68,6 +78,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $batteryType],
             ],
             [
+                'user_id' => 2,
                 'name' => 'Kluang Recycling Station',
                 'address' => '23 Jalan Mersing, Kluang, Johor 86000',
                 'phone' => '(07) 555-3456',
@@ -85,9 +96,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://kluangrecycle.example.com',
                 'waste_types' => [$biologicalType, $clothesType, $shoesType, $trashType],
             ],
-            
+
             // Kedah
             [
+                'user_id' => 3,
                 'name' => 'Alor Setar Recycling Hub',
                 'address' => '45 Jalan Sultan Badlishah, Alor Setar, Kedah 05100',
                 'phone' => '(04) 555-1122',
@@ -106,6 +118,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$metalType, $paperType, $plasticType, $biologicalType],
             ],
             [
+                'user_id' => 3,
                 'name' => 'Sungai Petani Green Center',
                 'address' => '12 Jalan Patani, Sungai Petani, Kedah 08000',
                 'phone' => '(04) 555-7890',
@@ -124,6 +137,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$whiteGlassType, $brownGlassType, $greenGlassType, $cardboardType],
             ],
             [
+                'user_id' => 3,
                 'name' => 'Kulim Waste Management',
                 'address' => '67 Jalan Kulim, Kulim, Kedah 09000',
                 'phone' => '(04) 555-2468',
@@ -141,9 +155,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://kulimrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Kelantan
             [
+                'user_id' => 4,
                 'name' => 'Kota Bharu Recycling Center',
                 'address' => '22 Jalan Sultan Yahya Petra, Kota Bharu, Kelantan 15200',
                 'phone' => '(09) 555-3344',
@@ -162,6 +177,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $cardboardType, $plasticType, $whiteGlassType],
             ],
             [
+                'user_id' => 4,
                 'name' => 'Pasir Mas Green Point',
                 'address' => '8 Jalan Ismail Petra, Pasir Mas, Kelantan 17000',
                 'phone' => '(09) 555-5678',
@@ -180,6 +196,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$metalType, $brownGlassType, $greenGlassType, $biologicalType],
             ],
             [
+                'user_id' => 4,
                 'name' => 'Tumpat Recycle Station',
                 'address' => '34 Jalan Tumpat, Tumpat, Kelantan 16200',
                 'phone' => '(09) 555-1357',
@@ -197,9 +214,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://tumpatrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Melaka
             [
+                'user_id' => 5,
                 'name' => 'Melaka City Recycling Hub',
                 'address' => '10 Jalan Kota, Melaka City, Melaka 75000',
                 'phone' => '(06) 555-8765',
@@ -218,6 +236,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 5,
                 'name' => 'Alor Gajah Green Center',
                 'address' => '25 Jalan Besar, Alor Gajah, Melaka 78000',
                 'phone' => '(06) 555-4321',
@@ -236,6 +255,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $batteryType],
             ],
             [
+                'user_id' => 5,
                 'name' => 'Jasin Recycling Point',
                 'address' => '45 Jalan Merdeka, Jasin, Melaka 77000',
                 'phone' => '(06) 555-9876',
@@ -253,9 +273,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://jasinrecycle.example.com',
                 'waste_types' => [$biologicalType, $clothesType, $shoesType, $trashType],
             ],
-            
+
             // Negeri Sembilan
             [
+                'user_id' => 6,
                 'name' => 'Seremban Recycling Center',
                 'address' => '12 Jalan Dato Bandar Tunggal, Seremban, Negeri Sembilan 70000',
                 'phone' => '(06) 555-1234',
@@ -274,6 +295,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $plasticType, $metalType, $whiteGlassType],
             ],
             [
+                'user_id' => 6,
                 'name' => 'Port Dickson Green Station',
                 'address' => '8 Jalan Pantai, Port Dickson, Negeri Sembilan 71000',
                 'phone' => '(06) 555-5678',
@@ -292,6 +314,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $cardboardType, $biologicalType],
             ],
             [
+                'user_id' => 6,
                 'name' => 'Nilai Recycling Hub',
                 'address' => '22 Jalan BBN, Nilai, Negeri Sembilan 71800',
                 'phone' => '(06) 555-9012',
@@ -309,9 +332,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://nilairecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Pahang
             [
+                'user_id' => 7,
                 'name' => 'Kuantan Green Center',
                 'address' => '15 Jalan Besar, Kuantan, Pahang 25000',
                 'phone' => '(09) 555-7654',
@@ -330,6 +354,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 7,
                 'name' => 'Cameron Highlands Recycling',
                 'address' => '5 Jalan Brinchang, Tanah Rata, Pahang 39000',
                 'phone' => '(05) 555-2345',
@@ -348,6 +373,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $biologicalType],
             ],
             [
+                'user_id' => 7,
                 'name' => 'Bentong Waste Management',
                 'address' => '33 Jalan Setapak, Bentong, Pahang 28700',
                 'phone' => '(09) 555-8901',
@@ -365,9 +391,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://bentongrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Perak
             [
+                'user_id' => 8,
                 'name' => 'Ipoh Recycling Station',
                 'address' => '18 Jalan Sultan Iskandar, Ipoh, Perak 30000',
                 'phone' => '(05) 555-4321',
@@ -386,6 +413,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $plasticType, $metalType, $cardboardType],
             ],
             [
+                'user_id' => 8,
                 'name' => 'Taiping Green Hub',
                 'address' => '9 Jalan Taming Sari, Taiping, Perak 34000',
                 'phone' => '(05) 555-8765',
@@ -404,6 +432,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$whiteGlassType, $brownGlassType, $greenGlassType, $biologicalType],
             ],
             [
+                'user_id' => 8,
                 'name' => 'Teluk Intan Recycling Center',
                 'address' => '27 Jalan Changkat, Teluk Intan, Perak 36000',
                 'phone' => '(05) 555-1098',
@@ -421,9 +450,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://telukintan.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Perlis
             [
+                'user_id' => 9,
                 'name' => 'Kangar Recycling Hub',
                 'address' => '7 Jalan Jubli Emas, Kangar, Perlis 01000',
                 'phone' => '(04) 555-6543',
@@ -442,6 +472,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 9,
                 'name' => 'Arau Green Station',
                 'address' => '12 Jalan Raja, Arau, Perlis 02600',
                 'phone' => '(04) 555-3210',
@@ -460,6 +491,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $batteryType],
             ],
             [
+                'user_id' => 9,
                 'name' => 'Padang Besar Recyclers',
                 'address' => '3 Jalan Pasar, Padang Besar, Perlis 02100',
                 'phone' => '(04) 555-7890',
@@ -477,9 +509,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://padangbesarrecycle.example.com',
                 'waste_types' => [$biologicalType, $clothesType, $shoesType, $trashType],
             ],
-            
+
             // Pulau Pinang (Penang)
             [
+                'user_id' => 10,
                 'name' => 'Georgetown Recycling Center',
                 'address' => '25 Jalan Penang, Georgetown, Pulau Pinang 10000',
                 'phone' => '(04) 555-2109',
@@ -498,6 +531,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $plasticType, $metalType, $cardboardType],
             ],
             [
+                'user_id' => 10,
                 'name' => 'Butterworth Green Hub',
                 'address' => '17 Jalan Chain Ferry, Butterworth, Pulau Pinang 12100',
                 'phone' => '(04) 555-6789',
@@ -516,6 +550,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$whiteGlassType, $brownGlassType, $greenGlassType, $biologicalType],
             ],
             [
+                'user_id' => 10,
                 'name' => 'Bayan Lepas Recycling Point',
                 'address' => '8 Jalan Mahsuri, Bayan Lepas, Pulau Pinang 11950',
                 'phone' => '(04) 555-0123',
@@ -533,9 +568,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://bayanlepasrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Sabah
             [
+                'user_id' => 11,
                 'name' => 'Kota Kinabalu Recycling Hub',
                 'address' => '20 Jalan Gaya, Kota Kinabalu, Sabah 88000',
                 'phone' => '(088) 555-3456',
@@ -554,6 +590,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 11,
                 'name' => 'Sandakan Green Center',
                 'address' => '12 Jalan Pelabuhan, Sandakan, Sabah 90000',
                 'phone' => '(089) 555-7654',
@@ -572,6 +609,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $batteryType],
             ],
             [
+                'user_id' => 11,
                 'name' => 'Tawau Recycling Station',
                 'address' => '35 Jalan St. Patrick, Tawau, Sabah 91000',
                 'phone' => '(089) 555-2109',
@@ -589,9 +627,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://tawaurecycle.example.com',
                 'waste_types' => [$biologicalType, $clothesType, $shoesType, $trashType],
             ],
-            
+
             // Sarawak
             [
+                'user_id' => 12,
                 'name' => 'Kuching Recycling Center',
                 'address' => '15 Jalan Padungan, Kuching, Sarawak 93100',
                 'phone' => '(082) 555-8976',
@@ -610,6 +649,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $plasticType, $metalType, $cardboardType],
             ],
             [
+                'user_id' => 12,
                 'name' => 'Miri Green Hub',
                 'address' => '27 Jalan Yu Seng, Miri, Sarawak 98000',
                 'phone' => '(085) 555-4321',
@@ -628,6 +668,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$whiteGlassType, $brownGlassType, $greenGlassType, $biologicalType],
             ],
             [
+                'user_id' => 12,
                 'name' => 'Sibu Recycling Station',
                 'address' => '8 Jalan Channel, Sibu, Sarawak 96000',
                 'phone' => '(084) 555-3210',
@@ -645,9 +686,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://siburecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Selangor
             [
+                'user_id' => 13,
                 'name' => 'Shah Alam Recycling Hub',
                 'address' => '22 Jalan Persiaran Damai, Shah Alam, Selangor 40000',
                 'phone' => '(03) 555-1234',
@@ -666,6 +708,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 13,
                 'name' => 'Petaling Jaya Green Center',
                 'address' => '17 Jalan Utara, Petaling Jaya, Selangor 46200',
                 'phone' => '(03) 555-5678',
@@ -684,6 +727,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $biologicalType],
             ],
             [
+                'user_id' => 13,
                 'name' => 'Klang Recycling Station',
                 'address' => '8 Jalan Dato Hamzah, Klang, Selangor 41000',
                 'phone' => '(03) 555-9012',
@@ -701,9 +745,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://klangrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Terengganu
             [
+                'user_id' => 14,
                 'name' => 'Kuala Terengganu Recycling Hub',
                 'address' => '9 Jalan Sultan Zainal Abidin, Kuala Terengganu, Terengganu 20000',
                 'phone' => '(09) 555-6789',
@@ -722,6 +767,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $plasticType, $metalType, $cardboardType],
             ],
             [
+                'user_id' => 14,
                 'name' => 'Kemaman Green Center',
                 'address' => '18 Jalan Sulaimani, Chukai, Terengganu 24000',
                 'phone' => '(09) 555-3456',
@@ -740,6 +786,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$whiteGlassType, $brownGlassType, $greenGlassType, $biologicalType],
             ],
             [
+                'user_id' => 14,
                 'name' => 'Dungun Recycling Point',
                 'address' => '5 Jalan Besar, Dungun, Terengganu 23000',
                 'phone' => '(09) 555-7890',
@@ -757,9 +804,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://dungunrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Kuala Lumpur (Federal Territory)
             [
+                'user_id' => 15,
                 'name' => 'KL City Recycling Hub',
                 'address' => '25 Jalan Tun Razak, Kuala Lumpur 50400',
                 'phone' => '(03) 555-2345',
@@ -778,6 +826,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 15,
                 'name' => 'Cheras Green Center',
                 'address' => '12 Jalan Cheras, Kuala Lumpur 56100',
                 'phone' => '(03) 555-6789',
@@ -796,6 +845,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $biologicalType],
             ],
             [
+                'user_id' => 15,
                 'name' => 'Sentul Recycling Station',
                 'address' => '8 Jalan Sentul, Kuala Lumpur 51000',
                 'phone' => '(03) 555-0123',
@@ -813,9 +863,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://sentulrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Labuan (Federal Territory)
             [
+                'user_id' => 16,
                 'name' => 'Labuan Recycling Hub',
                 'address' => '10 Jalan Merdeka, Labuan 87000',
                 'phone' => '(087) 555-4567',
@@ -834,6 +885,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$paperType, $plasticType, $metalType, $cardboardType],
             ],
             [
+                'user_id' => 16,
                 'name' => 'Victoria Point Green Center',
                 'address' => '5 Jalan Tun Mustapha, Labuan 87007',
                 'phone' => '(087) 555-8910',
@@ -852,6 +904,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$whiteGlassType, $brownGlassType, $greenGlassType, $biologicalType],
             ],
             [
+                'user_id' => 16,
                 'name' => 'Labuan Town Recycling Point',
                 'address' => '22 Jalan Dewan, Labuan 87008',
                 'phone' => '(087) 555-3210',
@@ -869,9 +922,10 @@ class RecyclingCenterSeeder extends Seeder
                 'website' => 'http://labuantownrecycle.example.com',
                 'waste_types' => [$clothesType, $shoesType, $batteryType, $trashType],
             ],
-            
+
             // Putrajaya (Federal Territory)
             [
+                'user_id' => 17,
                 'name' => 'Putrajaya Recycling Center',
                 'address' => '15 Persiaran Perdana, Putrajaya 62000',
                 'phone' => '(03) 555-7654',
@@ -890,6 +944,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$plasticType, $paperType, $cardboardType, $metalType],
             ],
             [
+                'user_id' => 17,
                 'name' => 'Precinct 9 Green Hub',
                 'address' => '7 Jalan P9, Putrajaya 62250',
                 'phone' => '(03) 555-2109',
@@ -908,6 +963,7 @@ class RecyclingCenterSeeder extends Seeder
                 'waste_types' => [$brownGlassType, $greenGlassType, $whiteGlassType, $biologicalType],
             ],
             [
+                'user_id' => 17,
                 'name' => 'Putrajaya Lake Recycling Point',
                 'address' => '3 Persiaran Tasik, Putrajaya 62050',
                 'phone' => '(03) 555-8765',
@@ -930,6 +986,17 @@ class RecyclingCenterSeeder extends Seeder
         foreach ($centers as $centerData) {
             $wasteTypes = $centerData['waste_types'];
             unset($centerData['waste_types']);
+
+            // Generate a random timestamp between $startDate and $endDate
+            $randomTimestamp = mt_rand($startDate->timestamp, $endDate->timestamp);
+            // Add the 'created_at' field with the random date
+            $centerData['created_at'] = Carbon::createFromTimestamp($randomTimestamp)->toDateTimeString();
+            // Add a 'updated_at' field as well, can be same as created_at for seeders
+            $centerData['updated_at'] = $centerData['created_at'];
+            // Add the 'status' field with a random status
+            $centerData['status'] = $statuses[array_rand($statuses)];
+
+            $centerData['is_active'] = true; // Set all centers to active by default
 
             $center = RecyclingCenter::create($centerData);
 

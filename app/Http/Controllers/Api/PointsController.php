@@ -8,11 +8,14 @@ use App\Models\MaterialPointConfig;
 use App\Models\Material;
 use App\Models\RecyclingHistory;
 use App\Models\User;
+use App\Models\WasteItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class PointsController extends Controller
 {
@@ -114,345 +117,66 @@ class PointsController extends Controller
         ]);
     }
 
-    /**
-     * Award points to a user for recycling a material.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function awardRecyclingPoints(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'material_id' => 'required|exists:materials,id',
-            'quantity' => 'required|numeric|min:1',
-        ]);
+    // /**
+    //  * Award points manually to a user.
+    //  * This is used by recycling center staff.
+    //  *
+    //  * @param  \Illuminate\Http\Request  $request
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function awardPoints(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'user_id' => 'required|exists:users,id',
+    //         'points' => 'required|integer|min:1',
+    //         'description' => 'required|string|max:255',
+    //         'category' => 'nullable|string|in:recycling,bonus,other',
+    //     ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Validation errors',
+    //             'errors' => $validator->errors()
+    //         ], 422);
+    //     }
 
-        $user = Auth::user();
-        $center = $user->recyclingCenter;
+    //     $staffUser = Auth::user();
+    //     $center = $staffUser->recyclingCenter;
 
-        if (!$center) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not associated with a recycling center'
-            ], 403);
-        }
+    //     if (!$center) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'User is not associated with a recycling center'
+    //         ], 403);
+    //     }
 
-        $materialId = $request->material_id;
-        $quantity = $request->quantity;
+    //     $targetUser = User::findOrFail($request->user_id);
+    //     $points = $request->points;
+    //     $description = $request->description;
+    //     $category = $request->input('category', 'other');
 
-        // Get the user who recycled
-        $recyclingUser = User::findOrFail($recyclingHistory->user_id);
+    //     // Create the transaction
+    //     $transaction = new PointsTransaction([
+    //         'user_id' => $targetUser->id,
+    //         'points' => $points,
+    //         'type' => 'earned',
+    //         'category' => $category,
+    //         'description' => $description,
+    //         'center_id' => $center->id,
+    //     ]);
 
-        // Get material points configuration for this center
-        $materialConfig = MaterialPointConfig::where('center_id', $center->id)
-            ->where('material_id', $materialId)
-            ->first();
+    //     $transaction->save();
 
-        if (!$materialConfig) {
-            // Use default points if no specific configuration exists
-            $material = Material::findOrFail($materialId);
-            $pointsPerUnit = $material->default_points;
-            $isEnabled = true;
-        } else {
-            $pointsPerUnit = $materialConfig->points;
-            $isEnabled = $materialConfig->is_enabled;
-        }
-
-        if (!$isEnabled) {
-            return response()->json([
-                'success' => false,
-                'message' => 'This material is not currently enabled for points'
-            ], 400);
-        }
-
-        // Calculate base points
-        $basePoints = (int) round($pointsPerUnit * $quantity);
-
-        // // Check for consecutive days bonus
-        // $bonusPoints = 0;
-        // $consecutiveDays = 1;
-        // $bonusConfig = $center->bonusConfig;
-
-        // if ($bonusConfig && $bonusConfig->consecutive_days_enabled) {
-        //     // Get user's recycling history for the past days
-        //     $now = Carbon::now();
-        //     $recentHistory = RecyclingHistory::where('user_id', $recyclingUser->id)
-        //         ->where('center_id', $center->id)
-        //         ->where('created_at', '<', $now->startOfDay())
-        //         ->orderBy('created_at', 'desc')
-        //         ->get()
-        //         ->groupBy(function ($date) {
-        //             return Carbon::parse($date->created_at)->format('Y-m-d');
-        //         });
-
-        //     // Count consecutive days up to the maximum
-        //     $checkDate = Carbon::now()->subDay();
-        //     $maxDays = $bonusConfig->max_consecutive_days;
-
-        //     while ($consecutiveDays < $maxDays) {
-        //         $dateKey = $checkDate->format('Y-m-d');
-
-        //         if (isset($recentHistory[$dateKey])) {
-        //             $consecutiveDays++;
-        //             $checkDate->subDay();
-        //         } else {
-        //             break;
-        //         }
-        //     }
-
-        //     // Calculate bonus if consecutive days > 1
-        //     if ($consecutiveDays > 1) {
-        //         $bonusMultiplier = $bonusConfig->consecutive_days_bonus * ($consecutiveDays - 1);
-        //         $bonusPoints = (int) round($basePoints * $bonusMultiplier);
-        //     }
-        // }
-
-        // Total points to award
-        $totalPoints = $basePoints;
-
-        DB::beginTransaction();
-
-        try {
-            // Create main points transaction
-            $transaction = new PointsTransaction([
-                'user_id' => $recyclingUser->id,
-                'points' => $basePoints,
-                'type' => PointsTransaction::TYPE_EARNED,
-                'category' => PointsTransaction::CATEGORY_RECYCLING,
-                'description' => "Recycled {$quantity} {$recyclingHistory->material->name}",
-                'center_id' => $center->id,
-            ]);
-
-            $recyclingHistory->pointsTransaction()->save($transaction);
-
-            // Create bonus transaction if applicable
-            if ($bonusPoints > 0) {
-                $bonusTransaction = new PointsTransaction([
-                    'user_id' => $recyclingUser->id,
-                    'points' => $bonusPoints,
-                    'type' => PointsTransaction::TYPE_EARNED,
-                    'category' => PointsTransaction::CATEGORY_BONUS,
-                    'description' => "Bonus for {$consecutiveDays} consecutive days of recycling",
-                    'center_id' => $center->id,
-                ]);
-
-                $recyclingUser->pointsTransactions()->save($bonusTransaction);
-            }
-
-            // Update recycling history with points
-            $recyclingHistory->points_earned = $totalPoints;
-            $recyclingHistory->save();
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Points awarded successfully',
-                'data' => [
-                    'base_points' => $basePoints,
-                    'bonus_points' => $bonusPoints,
-                    'total_points' => $totalPoints,
-                    'consecutive_days' => $consecutiveDays
-                ]
-            ]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to award points: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Award points manually to a user.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function awardPoints(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'points' => 'required|integer|min:1',
-            'description' => 'required|string|max:255',
-            'category' => 'nullable|string|in:recycling,bonus,other',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user = Auth::user();
-        $center = $user->recyclingCenter;
-
-        if (!$center) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not associated with a recycling center'
-            ], 403);
-        }
-
-        $targetUser = User::findOrFail($request->user_id);
-        $points = $request->points;
-        $description = $request->description;
-        $category = $request->input('category', 'other');
-
-        // Create the transaction
-        $transaction = new PointsTransaction([
-            'user_id' => $targetUser->id,
-            'points' => $points,
-            'type' => PointsTransaction::TYPE_EARNED,
-            'category' => $category,
-            'description' => $description,
-            'center_id' => $center->id,
-        ]);
-
-        $transaction->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Points awarded successfully',
-            'data' => $transaction
-        ]);
-    }
-
-    /**
-     * Get materials points rates.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getMaterialPointsRates(Request $request)
-    {
-        $centerId = $request->input('center_id');
-
-        // If center_id is provided, get rates for that center
-        if ($centerId) {
-            $materialConfigs = MaterialPointConfig::with('material')
-                ->where('center_id', $centerId)
-                ->where('is_enabled', true)
-                ->get();
-
-            $rates = $materialConfigs->map(function ($config) {
-                return [
-                    'material_id' => $config->material_id,
-                    'material_name' => $config->material->name,
-                    'points' => $config->points,
-                    'icon' => $config->material->icon,
-                ];
-            });
-        } else {
-            // Otherwise get default rates
-            $materials = Material::all();
-
-            $rates = $materials->map(function ($material) {
-                return [
-                    'material_id' => $material->id,
-                    'material_name' => $material->name,
-                    'points' => $material->default_points,
-                    'icon' => $material->icon,
-                ];
-            });
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $rates
-        ]);
-    }
-
-    /**
-     * Configure points for materials.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function configureMaterialPoints(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'materials' => 'required|array',
-            'materials.*.id' => 'required|exists:materials,id',
-            'materials.*.points' => 'required|integer|min:0',
-            'materials.*.enabled' => 'required|boolean',
-            'global_multiplier' => 'nullable|numeric|min:0.1',
-            'bonus_config' => 'nullable|array',
-            'bonus_config.consecutive_days_enabled' => 'nullable|boolean',
-            'bonus_config.consecutive_days_bonus' => 'nullable|numeric|min:0.1',
-            'bonus_config.max_consecutive_days' => 'nullable|integer|min:2',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation errors',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $user = Auth::user();
-        $center = $user->recyclingCenter;
-
-        if (!$center) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not associated with a recycling center'
-            ], 403);
-        }
-
-        try {
-            // Configure materials
-            MaterialPointConfig::configureMaterials(
-                $center->id,
-                $request->materials
-            );
-
-            // Update center's global multiplier if provided
-            if ($request->has('global_multiplier')) {
-                $center->points_multiplier = $request->global_multiplier;
-            }
-
-            // Update bonus configuration if provided
-            // if ($request->has('bonus_config')) {
-            //     $bonusConfig = $request->bonus_config;
-
-            //     // Create or update bonus config
-            //     $center->bonusConfig()->updateOrCreate(
-            //         ['center_id' => $center->id],
-            //         [
-            //             'consecutive_days_enabled' => $bonusConfig['consecutive_days_enabled'] ?? false,
-            //             'consecutive_days_bonus' => $bonusConfig['consecutive_days_bonus'] ?? 0.5,
-            //             'max_consecutive_days' => $bonusConfig['max_consecutive_days'] ?? 5,
-            //         ]
-            //     );
-            // }
-
-            $center->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Points configuration updated successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update points configuration: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Points awarded successfully',
+    //         'data' => [
+    //             'transaction' => $transaction,
+    //             'new_balance' => PointsTransaction::getBalance($targetUser->id)
+    //         ]
+    //     ]);
+    // }
 
     /**
      * Get points statistics.
@@ -546,5 +270,215 @@ class PointsController extends Controller
             'success' => true,
             'data' => $leaderboard
         ]);
+    }
+
+    /**
+     * Record recycling activities with multiple items and award points
+     * Support both predefined and manual items
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function recyclingWithPoints(Request $request)
+    {
+        // For debugging - log the request data
+        Log::info('Recycling request data:', $request->all());
+
+        // Special log for items
+        if ($request->has('items')) {
+            Log::info('Items data type: ' . gettype($request->items));
+            if (is_string($request->items)) {
+                Log::info('Items JSON: ' . $request->items);
+            }
+        }
+
+        // Validate basic information
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'notes' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Get items from request
+        $items = [];
+        if ($request->has('items')) {
+            // If items are in JSON format (from FormData)
+            if (is_string($request->items)) {
+                try {
+                    $items = json_decode($request->items, true);
+
+                    // Check if JSON decoding failed
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        Log::error('JSON decode error: ' . json_last_error_msg());
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Invalid JSON in items: ' . json_last_error_msg()
+                        ], 422);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Exception decoding items JSON: ' . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Error parsing items: ' . $e->getMessage()
+                    ], 422);
+                }
+            } else {
+                // If items are already in array format
+                $items = $request->items;
+            }
+        }
+
+        // Validate items
+        if (empty($items) || !is_array($items)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No recycling items provided or invalid format'
+            ], 422);
+        }
+
+        // Get the staff user and center
+        $staffUser = Auth::user();
+        $center = $staffUser->recyclingCenter;
+
+        if (!$center) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You are not associated with a recycling center'
+            ], 403);
+        }
+
+        $user = User::findOrFail($request->user_id);
+        $imagePath = null;
+        $totalPoints = 0;
+        $histories = [];
+
+        DB::beginTransaction();
+
+        try {
+            // Handle image upload if present - single image for the whole transaction
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                // Store the image and get the path
+                $imagePath = $image->store('recycling_images', 'public');
+                Log::info('Image stored at: ' . $imagePath);
+            }
+
+            // Process each item
+            foreach ($items as $item) {
+                // Validate each item
+                if (empty($item['waste_name']) || !isset($item['quantity']) || empty($item['unit'])) {
+                    Log::error('Invalid item data: ' . json_encode($item));
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Invalid item data provided'
+                    ], 422);
+                }
+
+                // Calculate points
+                $points = 0;
+                $wasteItemId = null;
+
+                // Handle waste_item_id conversion from string to int or null
+                $itemId = $item['waste_item_id'] ?? null;
+                if (
+                    $itemId && is_string($itemId) &&
+                    (strpos($itemId, 'manual_') === 0 || $itemId === 'manual')
+                ) {
+                    // Manual item - just keep waste_item_id as null
+                    $wasteItemId = null;
+                } elseif ($itemId && is_numeric($itemId)) {
+                    // Valid waste item ID - convert to int
+                    $wasteItemId = (int)$itemId;
+                }
+
+                // Predefined waste item
+                if ($wasteItemId !== null) {
+                    $wasteItem = WasteItem::find($wasteItemId);
+
+                    if ($wasteItem) {
+                        $wasteItemId = $wasteItem->id;
+                        $points = $wasteItem->points * $item['quantity'];
+                    } else {
+                        // If waste_item_id is provided but invalid, treat as manual
+                        Log::warning("Invalid waste_item_id: $wasteItemId - treating as manual entry");
+                        $wasteItemId = null;
+                        $points = isset($item['totalPoints']) ? $item['totalPoints'] : (isset($item['points']) ? $item['points'] * $item['quantity'] : 0);
+                    }
+                }
+                // Manual waste item
+                else {
+                    $points = isset($item['totalPoints']) ? $item['totalPoints'] : (isset($item['points']) ? $item['points'] * $item['quantity'] : 0);
+                }
+
+                $totalPoints += $points;
+                Log::info("Adding $points points for item {$item['waste_name']}");
+
+                // Create recycling history entry
+                $history = RecyclingHistory::create([
+                    'user_id' => $user->id,
+                    'center_id' => $center->id,
+                    'waste_item_id' => $wasteItemId,
+                    'waste_name' => $item['waste_name'],
+                    'quantity' => $item['quantity'],
+                    'unit' => $item['unit'],
+                    'image' => $imagePath, // Same image for all items
+                ]);
+
+                $histories[] = $history;
+
+                // Create points transaction for the item
+                $transaction = new PointsTransaction([
+                    'user_id' => $user->id,
+                    'points' => $points,
+                    'type' => 'earned',
+                    'category' => 'recycling',
+                    'description' => "Recycled {$item['quantity']} {$item['unit']} of {$item['waste_name']}",
+                    'center_id' => $center->id,
+                ]);
+
+                $history->pointsTransaction()->save($transaction);
+            }
+
+            DB::commit();
+            Log::info("Successfully awarded $totalPoints points to user {$user->id}");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Recycling recorded and points awarded successfully',
+                'data' => [
+                    'histories' => $histories,
+                    'total_points_earned' => $totalPoints,
+                    'new_balance' => PointsTransaction::getBalance($user->id),
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email
+                    ],
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Exception in recyclingWithPoints: ' . $e->getMessage());
+            Log::error($e->getTraceAsString());
+
+            // Clean up the uploaded image if something went wrong
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to record recycling: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

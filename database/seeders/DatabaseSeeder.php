@@ -13,19 +13,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Fauzan Mazlam',
-            'email' => 'fauzanmazlam88@gmail.com',
-        ]);
-
         $this->call([
+            UserTableSeeder::class,
             WasteTypeSeeder::class,
             WasteItemSeeder::class,
             RecyclingCenterSeeder::class,
-            CleanupEventSeeder::class,
             BadgeSeeder::class,
+            RewardTableSeeder::class,
+
+            // Point Transactions and Recycling History
+            RecyclingHistoryTableSeeder::class,
+
+            RewardRedemptionTableSeeder::class,
         ]);
     }
 }

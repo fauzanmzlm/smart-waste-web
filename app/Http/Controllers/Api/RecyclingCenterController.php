@@ -30,7 +30,6 @@ class RecyclingCenterController extends Controller
             });
         }
 
-        // Sort by distance if lat/lng provided
         if ($request->has('latitude') && $request->has('longitude')) {
             $lat = $request->latitude;
             $lng = $request->longitude;
@@ -38,17 +37,9 @@ class RecyclingCenterController extends Controller
             // We'll get all centers and sort them by distance
             $centers = $query->get();
 
-            // Calculate distance for each center
-            foreach ($centers as $center) {
-                $center->distance = $center->getDistanceAttribute($lat, $lng);
-            }
-
-            // Sort by distance
-            $sortedCenters = $centers->sortBy('distance');
-
             return response()->json([
                 'success' => true,
-                'data' => $sortedCenters->values()->all()
+                'data' => $centers->values()->all()
             ]);
         }
 
@@ -98,8 +89,9 @@ class RecyclingCenterController extends Controller
         // Handle image upload if provided
         $imagePath = null;
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/recycling_centers');
-            $imageUrl = Storage::url($imagePath);
+            // Store the uploaded image
+            $image = $request->file('image');
+            $imagePath = $image->storeAs('recycling-centers', $image->getClientOriginalName());
         }
 
         $center = RecyclingCenter::create([
@@ -111,7 +103,7 @@ class RecyclingCenterController extends Controller
             'hours' => $request->hours,
             'description' => $request->description,
             'website' => $request->website,
-            'image' => $imageUrl ?? null,
+            'image' => $imagePath ?? null,
         ]);
 
         // Attach waste types if provided

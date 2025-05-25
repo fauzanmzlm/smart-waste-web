@@ -297,13 +297,19 @@ class RewardController extends Controller
         // Handle image upload if provided
         if ($request->hasFile('image')) {
             // Delete previous image if exists
-            if ($reward->image) {
-                $oldImagePath = str_replace('/storage', 'public', $reward->image);
-                Storage::delete($oldImagePath);
-            }
+            // if ($reward->image) {
+            //     $oldImagePath = str_replace('/storage', 'public', $reward->image);
+            //     Storage::delete($oldImagePath);
+            // }
 
-            $imagePath = $request->file('image')->store('public/rewards');
-            $reward->image = Storage::url($imagePath);
+            // $imagePath = $request->file('image')->store('public/rewards');
+            // $reward->image = Storage::url($imagePath);
+
+            $image = $request->file('image');
+            $filename = $image->getClientOriginalName();  // Get the original filename
+            $image->storeAs('rewards', $filename);  // Store the file in the rewards directory
+
+            $reward->image = $filename;
         }
 
         // Update fields
